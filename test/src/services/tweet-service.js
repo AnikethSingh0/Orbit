@@ -37,7 +37,7 @@ class TweetService {
     async getAll(){
         try{
             const tweets = await this.tweetRepository.getAllTweets(0,10);
-
+ 
             return tweets;
         }catch(error){
             throw new Error('Error fetching tweets: ' + error.message);
