@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-
+const { mongo_uri } = require('./config');
 const connectDatabase = async () => {
-    await mongoose.connect('mongodb://localhost:27017/twitter_dev');
+    await mongoose.connect(mongo_uri);
 }
 
 module.exports = connectDatabase;
