@@ -12,6 +12,14 @@ const chatSocketHandler = (io) => {
             console.log(`Client ${scocket.id} joined room: ${roomId}`);
         });
 
+        scocket.on('joinNotificationRoom', ({ userId }) => {
+            if (userId) {
+                scocket.join(userId.toString());
+                console.log(`Client ${scocket.id} joined notification room: ${userId}`);
+            }
+        });
+
+        
         scocket.on('chatMessage', async ({ roomId, senderId, receiverId, message, mediaUrl }) => {
             try {
                 const roomid = generateRoomId(senderId, receiverId);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 import { ToastProvider, useToast } from './contexts/ToastContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { getToken, setToken, removeToken } from './lib/api';
 import { parseJwt } from './lib/utils';
 import Layout from './components/Layout';
@@ -10,6 +11,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Setup from './pages/Setup';
 import Messages from './pages/Messages';
+import Notifications from './pages/Notifications';
 
 const AppContent = () => {
   const [token, setTokenState] = useState(getToken());
@@ -69,17 +71,20 @@ const AppContent = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Layout userProfile={userProfile} onLogout={handleLogout} scrollToComposer={scrollToComposer} />}>
-        <Route index element={<Home token={token} userProfile={userProfile} />} />
-        <Route path="setup" element={<Setup userProfile={userProfile} />} />
-        <Route path="profile" element={<Profile userProfile={userProfile} />} />
-        <Route path="profile/:userId" element={<Profile userProfile={userProfile} />} />
-        <Route path="messages" element={<Messages userProfile={userProfile} />} />
-        <Route path="messages/:userId" element={<Messages userProfile={userProfile} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <NotificationProvider userProfile={userProfile}>
+      <Routes>
+        <Route path="/" element={<Layout userProfile={userProfile} onLogout={handleLogout} scrollToComposer={scrollToComposer} />}>
+          <Route index element={<Home token={token} userProfile={userProfile} />} />
+          <Route path="setup" element={<Setup userProfile={userProfile} />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="profile" element={<Profile userProfile={userProfile} />} />
+          <Route path="profile/:userId" element={<Profile userProfile={userProfile} />} />
+          <Route path="messages" element={<Messages userProfile={userProfile} />} />
+          <Route path="messages/:userId" element={<Messages userProfile={userProfile} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </NotificationProvider>
   );
 };
 

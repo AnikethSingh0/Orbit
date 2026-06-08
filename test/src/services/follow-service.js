@@ -1,5 +1,7 @@
 const FollowRepository = require('../repository/followRepository.js');
 const UserRepository = require('../repository/userRepository.js');
+const redis = require('../config/redis-config.js');
+const notificationQueue = require('../queue/notification-queue.js');
 class FollowService {
     constructor() {
         this.followRepository = new FollowRepository();
@@ -24,7 +26,22 @@ class FollowService {
                 await this.followRepository.create({ follower: followerId, following: followingId });
                 await this.userRepository.incrementFollowerCount(followingId);
                 await this.userRepository.incrementFollowingCount(followerId);
-                return { message: "Followed successfully" };
+                //5. Create a notification for the user being followed
+                const countKey = `notif_count:${followingId}:follow:User`;
+                const scheduleKey = `notif_schedule:${followingId}:follow:User`;
+                await redis.incr(countKey);
+                const scheduledJob = await redis.get(scheduleKey);
+                if (!scheduledJob) {
+                    await notificationQueue.add('notification', {
+                        recipient: followingId,
+                        sender: followerId,
+                        type: 'follow',
+                        targetId: followerId,
+                        onmodel: 'User',
+                        countKey
+                    }, { delay: 60000 });
+                    await redis.set(scheduleKey, 'true', 'EX', 60);
+                }
             }
         }catch(error){
             console.log("Error in FollowService while toggling follow:", error);

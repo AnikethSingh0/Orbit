@@ -1,6 +1,7 @@
 const CommentRepository = require('../repository/commentRepository');
 const TweetRepository = require('../repository/tweetRepository');
-
+const redis = require('../config/redis-config.js');
+const notificationQueue = require('../queue/notification-queue.js');
 class CommentService{
     constructor(){
         this.commentRepository = new CommentRepository();
@@ -17,6 +18,27 @@ class CommentService{
 
             const comment = await this.commentRepository.create(commentData);
             await this.tweetRepository.incrementCommentCount(data.parentTweet);
+            
+            // Create a notification for the new comment
+            const tweet = await this.tweetRepository.getTweets(data.parentTweet);
+            if (tweet && tweet.user.toString() !== data.user.toString()) {
+                const recipientStr = tweet.user.toString();
+                const countKey = `notif_count:${recipientStr}:comment:${data.parentTweet}`;
+                const scheduleKey = `notif_schedule:${recipientStr}:comment:${data.parentTweet}`;
+                await redis.incr(countKey);
+                const scheduledJob = await redis.get(scheduleKey);
+                if (!scheduledJob) {
+                    await notificationQueue.add('notification', {
+                        recipient: recipientStr,
+                        sender: data.user,
+                        type: 'comment',
+                        targetId: comment.id,
+                        onmodel: 'Tweet',
+                        countKey
+                    }, { delay: 60000 });
+                    await redis.set(scheduleKey, 'true', 'EX', 60);
+                }
+            }
 
             return comment;
         }catch(error){
@@ -36,6 +58,27 @@ class CommentService{
             const reply = await this.commentRepository.create(replyData);
             await this.tweetRepository.incrementCommentCount(data.parentTweet);
             await this.commentRepository.incrementCommentCount(data.parentCommentId);
+
+            // Create a notification for the new reply
+            const parentComment = await this.commentRepository.model.findById(data.parentCommentId);
+            if (parentComment && parentComment.user.toString() !== data.user.toString()) {
+                const recipientStr = parentComment.user.toString();
+                const countKey = `notif_count:${recipientStr}:comment:${data.parentCommentId}`;
+                const scheduleKey = `notif_schedule:${recipientStr}:comment:${data.parentCommentId}`;
+                await redis.incr(countKey);
+                const scheduledJob = await redis.get(scheduleKey);
+                if (!scheduledJob) {
+                    await notificationQueue.add('notification', {
+                        recipient: recipientStr,
+                        sender: data.user,
+                        type: 'comment',
+                        targetId: reply.id,
+                        onmodel: 'Comment',
+                        countKey
+                    }, { delay: 60000 });
+                    await redis.set(scheduleKey, 'true', 'EX', 60);
+                }
+            }
 
             return reply;
         }catch(error){

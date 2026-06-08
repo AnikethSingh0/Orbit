@@ -6,6 +6,8 @@ import OrbitLogo from './ui/OrbitLogo';
 import Avatar from './ui/Avatar';
 import Button from './ui/Button';
 import { getImageUrl } from '../lib/utils';
+import { useNotification } from '../contexts/NotificationContext';
+import NotificationDropdown from './NotificationDropdown';
 
 const navItems = [
   { label: 'Home', icon: Home, path: '/' },
@@ -20,6 +22,7 @@ const Sidebar = ({ userProfile, onLogout, onPostClick }) => {
   const username = userProfile?.username || 'user';
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
+  const { unreadCount, isDropdownOpen, toggleDropdown } = useNotification();
 
   return (
     <header className="sidebar">
@@ -41,9 +44,35 @@ const Sidebar = ({ userProfile, onLogout, onPostClick }) => {
         <nav className="nav-links" aria-label="Primary navigation">
           {navItems.map(({ label, icon: Icon, path }) => {
             const active = location.pathname === path;
+            const isNotifications = label === 'Notifications';
+
+            if (isNotifications) {
+              return (
+                <div key={label} className="relative">
+                  <button 
+                    onClick={(e) => { e.preventDefault(); toggleDropdown(); }} 
+                    className={`nav-item w-full notification-toggle-btn ${isDropdownOpen ? 'active' : ''}`}
+                  >
+                    <div className="relative">
+                      <Icon size={26} className="nav-icon" />
+                      {unreadCount > 0 && (
+                        <div className="absolute -top-1 -right-1 bg-[#1d9bf0] text-white text-[11px] font-bold h-5 min-w-[20px] flex items-center justify-center rounded-full px-1 border-2 border-black">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </div>
+                      )}
+                    </div>
+                    <span className="nav-text">{label}</span>
+                  </button>
+                  <NotificationDropdown />
+                </div>
+              );
+            }
+
             return (
               <Link to={path} className={`nav-item ${active ? 'active' : ''}`} key={label}>
-                <Icon size={26} className="nav-icon" />
+                <div className="relative">
+                  <Icon size={26} className="nav-icon" />
+                </div>
                 <span className="nav-text">{label}</span>
               </Link>
             );
