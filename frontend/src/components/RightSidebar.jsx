@@ -19,10 +19,10 @@ const RightSidebar = () => {
   return (
     <aside className="right-sidebar">
       <div className="right-sidebar-inner">
-        <div className="search-container">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Search Orbit" aria-label="Search Orbit" />
+        <div className="sticky top-0 bg-[#030305]/80 backdrop-blur-md pt-2 pb-4 z-10">
+          <div className="flex items-center bg-[#202327] rounded-full px-4 py-3 focus-within:bg-[#030305] focus-within:ring-1 focus-within:ring-[#3b82f6] transition-all">
+            <Search size={18} className="text-gray-500 mr-3" />
+            <input type="text" placeholder="Search Orbit" aria-label="Search Orbit" className="bg-transparent border-none outline-none text-white w-full text-[15px] placeholder-gray-500" />
           </div>
         </div>
 
@@ -30,33 +30,33 @@ const RightSidebar = () => {
 
 
 
-        <section className="trending-box">
-          <h2>What's happening</h2>
+        <section className="bg-[rgba(15,15,18,0.4)] backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
+          <h2 className="text-xl font-extrabold text-white mb-4">What's happening</h2>
           {trends.map((trend) => (
-            <a href="#" className="trending-item" key={trend.title}>
-              <div className="trending-category">{trend.category}</div>
-              <div className="trending-title">{trend.title}</div>
-              <div className="trending-stats">{trend.stats}</div>
+            <a href="#" className="block py-3 hover:bg-white/5 -mx-5 px-5 transition-colors group" key={trend.title}>
+              <div className="text-[13px] text-gray-500 mb-0.5">{trend.category}</div>
+              <div className="text-[16px] font-bold text-white group-hover:text-[#3b82f6] transition-colors">{trend.title}</div>
+              <div className="text-[13px] text-gray-500 mt-0.5">{trend.stats}</div>
             </a>
           ))}
-          <a href="#" className="show-more">Show more</a>
+          <a href="#" className="block mt-2 text-[#3b82f6] hover:underline text-[15px] pt-3 -mx-5 px-5 border-t border-white/5">Show more</a>
         </section>
 
-        <section className="trending-box who-to-follow">
-          <h2>Who to follow</h2>
+        <section className="bg-[rgba(15,15,18,0.4)] backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
+          <h2 className="text-xl font-extrabold text-white mb-4">Who to follow</h2>
           {suggestions.map((user) => (
-            <div key={user.handle} className="follow-item">
-              <div className="follow-user">
+            <div key={user.handle} className="flex items-center justify-between py-3 hover:bg-white/5 -mx-5 px-5 transition-colors">
+              <div className="flex items-center gap-3 overflow-hidden">
                 <Avatar name={user.name} size="md" />
-                <div className="follow-copy">
-                  <span>{user.name}</span>
-                  <p>@{user.handle}</p>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="font-bold text-white text-[15px] hover:underline truncate">{user.name}</span>
+                  <p className="text-gray-500 text-[14px] truncate">@{user.handle}</p>
                 </div>
               </div>
-              <Button variant="secondary" size="sm" className="follow-btn">Follow</Button>
+              <Button variant="secondary" size="sm" className="ml-3 shrink-0 rounded-full font-bold bg-white text-black hover:bg-gray-200">Follow</Button>
             </div>
           ))}
-          <a href="#" className="show-more">Show more</a>
+          <a href="#" className="block mt-2 text-[#3b82f6] hover:underline text-[15px] pt-3 -mx-5 px-5 border-t border-white/5">Show more</a>
         </section>
 
         <footer className="sidebar-footer">

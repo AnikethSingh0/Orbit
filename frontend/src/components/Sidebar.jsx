@@ -63,7 +63,6 @@ const Sidebar = ({ userProfile, onLogout, onPostClick }) => {
                     </div>
                     <span className="nav-text">{label}</span>
                   </button>
-                  <NotificationDropdown />
                 </div>
               );
             }

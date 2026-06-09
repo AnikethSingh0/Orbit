@@ -2,33 +2,34 @@
 
 :root {
   --bg-color: #030305;
-  --bg-soft: rgba(15, 15, 17, 0.6);
-  --bg-elevated: rgba(20, 20, 24, 0.65);
-  --bg-card: rgba(20, 20, 24, 0.4);
+  --bg-soft: rgba(255, 255, 255, 0.03);
+  --bg-elevated: rgba(15, 15, 18, 0.6);
+  --bg-card: rgba(255, 255, 255, 0.02);
   --bg-muted: #0a0a0d;
-  --text-color: #e7e9ea;
+  --text-color: #ededed;
   --text-strong: #ffffff;
-  --dim-text: #8b8d96;
-  --muted-text: #61626a;
-  --primary-color: #1d9bf0;
-  --primary-hover: #1a8cd8;
-  --accent-color: #00ba7c;
-  --sky-color: #1d9bf0;
+  --dim-text: #a1a1aa;
+  --muted-text: #71717a;
+  --primary-color: #f8fafc;
+  --primary-hover: #e2e8f0;
+  --accent-color: #3b82f6;
+  --sky-color: #3b82f6;
   --rose-color: #f43f5e;
   --warning-color: #f59e0b;
   --success-color: #10b981;
   --error-color: #ef4444;
-  --border-color: rgba(255, 255, 255, 0.05);
-  --border-strong: rgba(255, 255, 255, 0.1);
-  --hover-bg: rgba(255, 255, 255, 0.055);
-  --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.58);
-  --shadow-ring: 0 0 0 1px rgba(255, 255, 255, 0.075);
-  --radius-sm: 8px;
-  --radius-md: 8px;
-  --radius-lg: 8px;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --hover-bg: rgba(255, 255, 255, 0.06);
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  --shadow-ring: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --sidebar-width: 280px;
-  --right-sidebar-width: 360px;
-  --feed-width: 680px;
+  --right-sidebar-width: 340px;
+  --feed-width: 640px;
 }
 
 * {
@@ -44,7 +45,7 @@ body {
   min-width: 320px;
   background: #000000;
   color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
@@ -173,14 +174,13 @@ textarea {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #7c3aed, #14b8a6);
-  color: #ffffff;
-  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--text-strong);
+  color: #030305;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 12px 42px rgba(124, 58, 237, 0.35);
+  background: #e4e4e7;
   transform: translateY(-1px);
 }
 
@@ -691,8 +691,11 @@ textarea {
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, var(--feed-width)) var(--right-sidebar-width);
   justify-content: center;
+  gap: 32px;
   min-height: 100vh;
   margin: 0 auto;
+  max-width: 1380px;
+  padding: 0 24px;
 }
 
 .app-container-messages {
@@ -705,13 +708,27 @@ textarea {
   width: var(--sidebar-width);
 }
 
-.sidebar-inner {
+.right-sidebar-inner {
   position: sticky;
-  top: 0;
+  top: 24px;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  padding: 18px 22px;
+  gap: 20px;
+  padding: 0;
+}
+
+.sidebar-inner {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 48px);
+  padding: 24px 20px;
+  background: rgba(15, 15, 18, 0.4);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
   overflow-y: auto;
 }
 
@@ -914,11 +931,19 @@ textarea {
 .post-composer {
   display: flex;
   gap: 16px;
-  padding: 20px 22px 18px;
-  border-bottom: 1px solid var(--border-color);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-    rgba(255, 255, 255, 0.01);
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: rgba(15, 15, 18, 0.4);
+  backdrop-filter: blur(24px);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.post-composer:focus-within {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 30px rgba(59, 130, 246, 0.1);
 }
 
 .composer-avatar-col {
@@ -1046,23 +1071,24 @@ textarea {
 
 .tweet-card {
   display: flex;
-  gap: 12px;
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-card);
-  backdrop-filter: blur(24px);
+  gap: 16px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(16px);
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tweet-card:hover {
   background: rgba(255, 255, 255, 0.04);
-  transform: scale(1.02);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), var(--shadow-glow);
   z-index: 10;
   position: relative;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
 }
 
 .tweet-card:focus-visible {

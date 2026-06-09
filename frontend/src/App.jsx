@@ -72,6 +72,11 @@ const AppContent = () => {
 
   return (
     <NotificationProvider userProfile={userProfile}>
+      <div className="fixed inset-0 z-[-1] bg-[#030305]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-[#030305] to-[#030305]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/10 via-[#030305] to-[#030305]" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPC9zdmc+')] opacity-20" />
+      </div>
       <Routes>
         <Route path="/" element={<Layout userProfile={userProfile} onLogout={handleLogout} scrollToComposer={scrollToComposer} />}>
           <Route index element={<Home token={token} userProfile={userProfile} />} />

@@ -5,6 +5,7 @@ import { Bell, Heart, UserPlus, MessageCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../components/ui/Avatar';
 import { getImageUrl } from '../lib/utils';
+import NotificationDropdown from '../components/NotificationDropdown';
 
 const NotificationContext = createContext(null);
 
@@ -151,7 +152,7 @@ export const NotificationProvider = ({ children, userProfile }) => {
       markAllAsRead,
       isDropdownOpen,
       setIsDropdownOpen,
-      toggleDropdown: () => setIsDropdownOpen(!isDropdownOpen),
+      toggleDropdown: () => setIsDropdownOpen(prev => !prev),
       closeDropdown: () => setIsDropdownOpen(false)
     }}>
       {children}
@@ -223,6 +224,7 @@ export const NotificationProvider = ({ children, userProfile }) => {
           })}
         </AnimatePresence>
       </div>
+      <NotificationDropdown />
     </NotificationContext.Provider>
   );
 };

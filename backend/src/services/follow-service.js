@@ -39,7 +39,7 @@ class FollowService {
                         targetId: followerId,
                         onmodel: 'User',
                         countKey
-                    }, { delay: 60000 });
+                    });
                     await redis.set(scheduleKey, 'true', 'EX', 60);
                 }
             }

@@ -43,7 +43,6 @@ const MobileNav = ({ onPostClick, userProfile }) => {
               </div>
             )}
           </div>
-          <NotificationDropdown />
         </button>
         <Link to="/profile" className={`mobile-nav-item ${location.pathname === '/profile' ? 'active' : ''}`} aria-label="Profile">
           {userProfile?.avatar ? (

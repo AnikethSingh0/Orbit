@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Heart, UserPlus, MessageCircle, CheckCircle2, X } from 'lucide-react';
+import { Bell, Heart, UserPlus, MessageCircle, X } from 'lucide-react';
 import { useNotification } from '../contexts/NotificationContext';
 import Avatar from './ui/Avatar';
-import { getImageUrl, formatTimeAgo } from '../lib/utils';
+import { getImageUrl, formatRelativeTime } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 
@@ -55,16 +55,23 @@ const NotificationDropdown = () => {
   return (
     <AnimatePresence>
       {isDropdownOpen && (
-        <motion.div
-          ref={dropdownRef}
-          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-          transition={{ duration: 0.2 }}
-          className="absolute z-50 w-[90vw] sm:w-[360px] max-h-[70vh] sm:max-h-[500px] flex flex-col bg-[#0a0a0d] border border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.8)] overflow-hidden 
-                     bottom-full right-0 mb-4 
-                     sm:bottom-auto sm:right-auto sm:left-[110%] sm:top-0 sm:ml-2 sm:mb-0"
-        >
+        <>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99] bg-black/40 backdrop-blur-sm" 
+            onClick={closeDropdown} 
+          />
+          <motion.div
+            ref={dropdownRef}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed z-[100] w-[90vw] sm:w-[400px] h-[80vh] sm:h-[500px] max-h-[80vh] flex flex-col bg-[#0a0a0d] border border-white/10 rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.8)] overflow-hidden 
+                       bottom-4 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-[80px] xl:left-[270px] sm:bottom-6"
+          >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/5 bg-[#0a0a0d]/80 backdrop-blur-md sticky top-0 z-10">
             <h2 className="font-bold text-xl text-white">Notifications</h2>
@@ -88,10 +95,10 @@ const NotificationDropdown = () => {
             ) : (
               <div className="divide-y divide-white/5">
                 {notifications.map((notif) => {
-                  const sender = notif.sender;
+                  const sender = notif.sender || notif.notification?.sender;
                   const displayName = sender?.fullName || sender?.username || 'Someone';
-                  const count = notif.count || 1;
-                  const type = notif.type;
+                  const count = notif.count || notif.notification?.count || 1;
+                  const type = notif.type || notif.notification?.type;
                   
                   let message = notif.message;
                   if (type === 'like') {
@@ -125,7 +132,7 @@ const NotificationDropdown = () => {
                           <span className="text-gray-400">{message}</span>
                         </p>
                         <span className="text-[13px] text-gray-500 mt-1 block">
-                          {formatTimeAgo(notif.createdAt || notif.id)}
+                          {formatRelativeTime(notif.createdAt || notif.id)}
                         </span>
                       </div>
                     </div>
@@ -135,6 +142,7 @@ const NotificationDropdown = () => {
             )}
           </div>
         </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
