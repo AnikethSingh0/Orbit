@@ -10,4 +10,5 @@ router.post('/tweet',passport.authenticate('jwt'
      ,tweetController.createTweet
     );
 router.get('/tweets',tweetController.getAllTweets);
+router.get('/trending-hashtags',tweetController.trendingHashtags);
 module.exports = router;

@@ -1,6 +1,22 @@
 const TweetService = require('../services/tweet-service');
 
 const tweetService = new TweetService();
+const trendingHashtags = async (req, res) => {
+    try {
+        const hashtags = await tweetService.getTrendingHashtags();
+        return res.status(200).json({
+            data : hashtags,
+            status : 'success',
+            message: 'Trending hashtags fetched successfully',
+            error : {},
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: 'Error fetching trending hashtags',
+            error: error.message
+        });
+    }
+};
 const createTweet = async (req, res) => {
     try {
         const data = req.body;
@@ -44,4 +60,5 @@ const getAllTweets = async (req, res) => {
 module.exports = {
     createTweet,
     getAllTweets,
+    trendingHashtags
 };

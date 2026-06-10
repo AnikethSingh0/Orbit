@@ -100,10 +100,9 @@ const Feed = ({
 
   return (
     <main className="feed">
-      <div className="sticky top-0 z-10 mb-6 bg-[rgba(15,15,18,0.7)] backdrop-blur-xl border-b border-white/5 px-6 py-4 rounded-b-2xl shadow-sm">
+      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
         <div>
-          <p className="text-[#3b82f6] text-[11px] font-extrabold uppercase tracking-[0.2em] mb-1">Orbit</p>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Home</h2>
+          <h2 className="text-xl font-bold text-white tracking-tight">Home</h2>
         </div>
       </div>
 

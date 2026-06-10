@@ -54,6 +54,10 @@ export async function fetchTweets(offset = 0, limit = 10) {
   return apiFetch(`/tweets?offset=${offset}&limit=${limit}`);
 }
 
+export async function fetchTrendingHashtags() {
+  return apiFetch('/trending-hashtags');
+}
+
 export async function createTweet(content, mediaFile) {
   const formData = new FormData();
   formData.append('content', content);
