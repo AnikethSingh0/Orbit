@@ -58,8 +58,8 @@ class LikeService {
                             targetId: modelId,
                             onmodel: modelType,
                             countKey
-                        }, { delay: 60000 });
-                        await redis.set(scheduleKey, 'true', 'EX', 60);
+                        }, { delay: 10000 });
+                        await redis.set(scheduleKey, 'true', 'EX', 10);
                     }
                 }
             }

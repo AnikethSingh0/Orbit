@@ -145,3 +145,7 @@ export async function uploadChatMedia(file) {
   const data = await readJson(res);
   return { res, data };
 }
+
+export async function searchUsers(query) {
+  return apiFetch(`/search/users?query=${encodeURIComponent(query)}`);
+}

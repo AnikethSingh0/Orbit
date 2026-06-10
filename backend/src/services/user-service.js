@@ -62,6 +62,17 @@ class UserService {
             throw error;
         }
     }
+    async searchUsers(query){
+        try{
+            if (!query || query.trim().length === 0) {
+                return []; 
+            }
+            const users = await this.userRepository.searchUsers(query);
+            return users;
+        }catch(error){
+            throw error;
+        }
+    }
 
 }
 module.exports = UserService;

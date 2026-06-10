@@ -30,6 +30,7 @@ class TweetService {
             });
             await pipeline.exec();
         }catch(error){
+            throw new Error('Error updating trending hashtags: ' + error.message);
         }
     }
     async create(data){
@@ -58,7 +59,7 @@ class TweetService {
             // unique tags
             const uniqueTags = [...new Set(tags)];
             await this.hashtagRepository.bulkCreate(uniqueTags, tweet._id);
-            this.updateTrendingHashtags(uniqueTags).catch((error) => {
+            await this.updateTrendingHashtags(uniqueTags).catch((error) => {
                 console.error('Error updating trending hashtags: ' + error.message);
             });
         }

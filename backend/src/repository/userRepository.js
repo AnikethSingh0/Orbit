@@ -56,5 +56,33 @@ class UserRepository extends baseRepository {
             throw error;
         }
     }
+    async searchUsers(query) {
+        return await this.model.aggregate([
+            {
+                $search: {
+                    index: 'user_autocomplete_index',
+                    autocomplete: {
+                        query: query,
+                        path: "username", 
+                        fuzzy: {
+                            maxEdits: 2, 
+                            prefixLength: 1 
+                        }
+                    }
+                }
+            },
+            {
+                $limit: 5
+            },
+            {
+                $project: {
+                    _id: 1,
+                    username: 1,
+                    fullName: 1,
+                    avatar: 1
+                }
+            }
+        ]);
+    }
 }
 module.exports = UserRepository;

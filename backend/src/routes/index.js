@@ -8,7 +8,9 @@ const v1LikeRoutes = require('./v1/like-routes.js');
 const v1ProfileRoutes = require('./v1/profile-routes.js');
 const v1FollowRoutes = require('./v1/follow-routes.js');
 const v1ChatRoutes = require('./v1/chat-routes.js');
+const v1SearchRoutes = require('./v1/search-routes.js');
 
+router.use('/v1/search', v1SearchRoutes);
 router.use('/v1/follow', v1FollowRoutes);
 router.use('/v1/profile', v1ProfileRoutes);
 router.use('/v1/likes', v1LikeRoutes);

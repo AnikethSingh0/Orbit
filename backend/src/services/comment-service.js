@@ -35,8 +35,8 @@ class CommentService{
                         targetId: comment.id,
                         onmodel: 'Tweet',
                         countKey
-                    }, { delay: 60000 });
-                    await redis.set(scheduleKey, 'true', 'EX', 60);
+                    }, { delay: 10000 });
+                    await redis.set(scheduleKey, 'true', 'EX', 10);
                 }
             }
 

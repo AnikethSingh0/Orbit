@@ -1,19 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Search, Loader2, TrendingUp } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search, Loader2, TrendingUp, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Avatar from './ui/Avatar';
 import Button from './ui/Button';
-import { fetchTrendingHashtags } from '../lib/api';
-
-const suggestions = [
-  { name: 'Linear', handle: 'linear' },
-  { name: 'Vercel', handle: 'vercel' },
-  { name: 'Cloudinary', handle: 'cloudinary' },
-];
+import { fetchTrendingHashtags, searchUsers, fetchTweets } from '../lib/api';
+import { useDebounce } from '../hooks/useDebounce';
 
 const RightSidebar = () => {
   const [trendingTags, setTrendingTags] = useState([]);
   const [isLoadingTrends, setIsLoadingTrends] = useState(true);
   const [showAllTrends, setShowAllTrends] = useState(false);
+
+  const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState(null);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  const debouncedQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
     const loadTrending = async () => {
@@ -31,13 +41,141 @@ const RightSidebar = () => {
     loadTrending();
   }, []);
 
+  // Load Suggested Users (from latest tweets)
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      try {
+        const { data } = await fetchTweets(0, 20);
+        if (data && data.status === 'success' && Array.isArray(data.data)) {
+          const uniqueUsers = [];
+          const userIds = new Set();
+          data.data.forEach(tweet => {
+            if (tweet.user && !userIds.has(tweet.user._id)) {
+              userIds.add(tweet.user._id);
+              uniqueUsers.push(tweet.user);
+            }
+          });
+          setSuggestedUsers(uniqueUsers);
+        }
+      } catch (err) {
+        console.error("Failed to load suggested users:", err);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+    loadSuggestions();
+  }, []);
+
+  // Search effect
+  useEffect(() => {
+    if (!debouncedQuery.trim()) {
+      setSearchResults([]);
+      setSearchError(null);
+      setIsSearching(false);
+      return;
+    }
+
+    const performSearch = async () => {
+      setIsSearching(true);
+      setSearchError(null);
+      try {
+        const { res, data } = await searchUsers(debouncedQuery);
+        if (res.ok && data && data.status === 'success' && Array.isArray(data.data)) {
+          setSearchResults(data.data);
+        } else {
+          setSearchResults([]);
+          setSearchError(data?.error || data?.message || 'API error: Unknown format');
+        }
+      } catch (err) {
+        console.error('Failed to search users:', err);
+        setSearchResults([]);
+        setSearchError(err.message);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    performSearch();
+  }, [debouncedQuery]);
+
+  // Click outside handler for search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <aside className="right-sidebar">
       <div className="right-sidebar-inner">
-        <div className="sticky top-0 bg-black/80 backdrop-blur-md pt-2 pb-4 z-10">
-          <div className="flex items-center bg-[#202327] rounded-full px-4 py-3 focus-within:bg-black focus-within:ring-1 focus-within:ring-[#1d9bf0] transition-all">
-            <Search size={18} className="text-gray-500 mr-3" />
-            <input type="text" placeholder="Search" aria-label="Search" className="bg-transparent border-none outline-none text-white w-full text-[15px] placeholder-gray-500" />
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md pt-2 pb-4 z-20" ref={searchContainerRef}>
+          <div className="relative">
+            <div className="flex items-center bg-[#202327] rounded-full px-4 py-3 focus-within:bg-black focus-within:ring-1 focus-within:ring-[#1d9bf0] transition-all relative">
+              <Search size={18} className="text-gray-500 mr-3" />
+              <input 
+                type="text" 
+                placeholder="Search" 
+                aria-label="Search users" 
+                className="bg-transparent border-none outline-none text-white w-full text-[15px] placeholder-gray-500"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSearchDropdown(true);
+                }}
+                onFocus={() => setShowSearchDropdown(true)}
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchResults([]);
+                  }} 
+                  className="absolute right-3 p-1 rounded-full bg-[#1d9bf0] text-white hover:bg-[#1a8cd8]"
+                >
+                  <X size={12} strokeWidth={3} />
+                </button>
+              )}
+            </div>
+
+            {/* Search Dropdown */}
+            {showSearchDropdown && searchQuery.trim() && (
+              <div className="absolute top-[110%] left-0 w-full bg-black border border-white/20 rounded-xl shadow-[0_0_15px_rgba(255,255,255,0.05)] overflow-hidden z-50 min-h-[100px] max-h-[400px] overflow-y-auto">
+                {isSearching ? (
+                  <div className="flex justify-center items-center py-8 text-gray-500">
+                    <Loader2 className="animate-spin text-[#1d9bf0]" size={24} />
+                  </div>
+                ) : searchError ? (
+                  <div className="py-8 px-4 text-center text-red-500 text-[14px]">
+                    Backend Error: {searchError}
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <div className="flex flex-col">
+                    {searchResults.map((user) => (
+                      <Link 
+                        to={`/profile/${user._id}`} 
+                        key={user._id}
+                        onClick={() => setShowSearchDropdown(false)}
+                        className="flex items-center gap-3 p-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                      >
+                        <Avatar name={user.fullName || user.username} src={user.avatar} size="md" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-bold text-white text-[15px] truncate">{user.fullName || user.username}</span>
+                          <span className="text-[#71767b] text-[15px] truncate">@{user.username}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 px-4 text-center text-[#71767b] text-[15px]">
+                    No results for "{searchQuery}"
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -91,19 +229,38 @@ const RightSidebar = () => {
 
         <section className="bg-[#16181c] rounded-2xl p-3 mb-4">
           <h2 className="text-lg font-extrabold text-white mb-3 pb-2 border-b border-white/10 px-1">Who to follow</h2>
-          {suggestions.map((user) => (
-            <div key={user.handle} className="flex items-center justify-between py-2.5 hover:bg-white/5 -mx-3 px-3 transition-colors">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <Avatar name={user.name} size="md" />
-                <div className="flex flex-col overflow-hidden">
-                  <span className="font-bold text-[#e7e9ea] text-[15px] hover:underline truncate">{user.name}</span>
-                  <p className="text-[#71767b] text-[13px] truncate">@{user.handle}</p>
-                </div>
-              </div>
-              <Button variant="secondary" size="sm" className="ml-2 shrink-0 rounded-full font-bold bg-white text-black hover:bg-gray-200">Follow</Button>
+          
+          {isLoadingSuggestions ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="animate-spin text-[#1d9bf0]" size={24} />
             </div>
-          ))}
-          <a href="#" className="block mt-1 text-[#1d9bf0] hover:bg-white/5 text-[14px] py-2.5 -mx-3 px-4 rounded-b-2xl transition-colors">Show more</a>
+          ) : suggestedUsers.length > 0 ? (
+            (showAllSuggestions ? suggestedUsers : suggestedUsers.slice(0, 3)).map((user) => (
+              <div key={user._id} className="flex items-center justify-between py-2.5 hover:bg-white/5 -mx-3 px-3 transition-colors">
+                <Link to={`/profile/${user._id}`} className="flex items-center gap-3 overflow-hidden group">
+                  <Avatar name={user.fullName || user.username} src={user.avatar} size="md" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[#e7e9ea] text-[15px] group-hover:underline truncate">{user.fullName || user.username}</span>
+                    <p className="text-[#71767b] text-[13px] truncate">@{user.username}</p>
+                  </div>
+                </Link>
+                <Button variant="secondary" size="sm" className="ml-2 shrink-0 rounded-full font-bold bg-white text-black hover:bg-gray-200">Follow</Button>
+              </div>
+            ))
+          ) : (
+            <div className="py-6 text-center text-[#71767b] text-[15px]">
+              No suggestions for now.
+            </div>
+          )}
+
+          {suggestedUsers.length > 3 && (
+            <button 
+              onClick={() => setShowAllSuggestions(!showAllSuggestions)}
+              className="block w-full text-left mt-1 text-[#1d9bf0] hover:bg-white/5 text-[14px] py-2.5 -mx-3 px-4 rounded-b-2xl transition-colors"
+            >
+              {showAllSuggestions ? 'Show less' : 'Show more'}
+            </button>
+          )}
         </section>
 
         <footer className="sidebar-footer">
