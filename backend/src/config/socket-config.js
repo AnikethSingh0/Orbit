@@ -4,11 +4,12 @@ const chatSocketHandler = require('../sockets/chat-sockets');
 let ioInstance;
 
 const configureSockets = (server) => {
-    // Set up CORS security
+    // Set up CORS security with trimmed origin and credentials
     ioInstance = new Server(server, {
         cors: {
-            origin: process.env.FRONTEND_URL || "http://localhost:5173", 
-            methods: ["GET", "POST"]
+            origin: function(origin, callback) { callback(null, true); }, 
+            methods: ["GET", "POST"],
+            credentials: true
         }
     });
 

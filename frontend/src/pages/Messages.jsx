@@ -71,15 +71,26 @@ const Messages = ({ userProfile }) => {
   useEffect(() => {
     if (!userProfile?.id) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '');
-    socketRef.current = io(baseUrl);
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+    const baseUrl = apiUrl.replace('/api/v1', '');
+    const socket = io(baseUrl, { withCredentials: true });
+    if (socket.disconnected) {
+      socket.connect();
+    }
+    socketRef.current = socket;
 
-    socketRef.current.on('connect', () => {
+    const handleConnect = () => {
       console.log('Connected to chat server');
       if (activeChatRef.current && userProfile?.id) {
-        socketRef.current.emit('joinRoom', { senderId: userProfile.id, receiverId: activeChatRef.current._id });
+        socketRef.current.emit('joinRoom', { senderId: userProfile._id || userProfile.id, receiverId: activeChatRef.current._id });
       }
-    });
+    };
+
+    if (socketRef.current.connected) {
+      handleConnect();
+    } else {
+      socketRef.current.on('connect', handleConnect);
+    }
 
     socketRef.current.on('newChatMessage', (message) => {
       setMessages((prev) => {
@@ -107,7 +118,9 @@ const Messages = ({ userProfile }) => {
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socketRef.current.off('connect');
+      socketRef.current.off('newChatMessage');
+      socketRef.current.off('messagesMarkedAsRead');
     };
   }, [userProfile?.id]);
 

@@ -2113,6 +2113,7 @@ input[type="range"] {
 @media (max-width: 760px) {
   .app-container {
     display: block;
+    padding: 0;
   }
 
   .sidebar {
@@ -2120,6 +2121,8 @@ input[type="range"] {
   }
 
   .feed {
+    width: 100% !important;
+    min-width: 100% !important;
     min-height: 100vh;
     padding-bottom: calc(72px + env(safe-area-inset-bottom));
     border-right: 0;
@@ -2217,6 +2220,9 @@ input[type="range"] {
 
   .tweet-actions {
     max-width: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
   }
 
   .media-grid.single .media-item-wrapper {

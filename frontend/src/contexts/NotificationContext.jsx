@@ -65,21 +65,32 @@ export const NotificationProvider = ({ children, userProfile }) => {
   useEffect(() => {
     if (!userProfile?.id) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '');
-    socketRef.current = io(baseUrl);
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+    const baseUrl = apiUrl.replace('/api/v1', '');
+    const socket = io(baseUrl, { withCredentials: true });
+    if (socket.disconnected) {
+      socket.connect();
+    }
+    socketRef.current = socket;
 
-    socketRef.current.on('connect', () => {
+    const handleConnect = () => {
       console.log('Notification socket connected');
-      // If the backend is updated to listen to 'joinNotificationRoom', emit it here
-      socketRef.current.emit('joinNotificationRoom', { userId: userProfile.id });
-    });
+      socketRef.current.emit('joinNotificationRoom', { userId: userProfile._id || userProfile.id });
+    };
+
+    if (socketRef.current.connected) {
+      handleConnect();
+    } else {
+      socketRef.current.on('connect', handleConnect);
+    }
 
     socketRef.current.on('newNotification', (data) => {
       handleNewNotification(data);
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socketRef.current.off('connect', handleConnect);
+      socketRef.current.off('newNotification');
     };
   }, [userProfile?.id, handleNewNotification]);
 
