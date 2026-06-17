@@ -54,6 +54,11 @@ export async function fetchTweets(offset = 0, limit = 10) {
   return apiFetch(`/tweets?offset=${offset}&limit=${limit}`);
 }
 
+export async function fetchHomeFeed(cursor, limit = 10) {
+  const c = cursor || 'null';
+  return apiFetch(`/home-feed/${c}/${limit}?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}`);
+}
+
 export async function fetchTrendingHashtags() {
   return apiFetch('/trending-hashtags');
 }

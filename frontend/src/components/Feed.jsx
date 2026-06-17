@@ -5,7 +5,7 @@ import PostComposer from './PostComposer';
 import LoadingSkeleton from './ui/LoadingSkeleton';
 import EmptyState from './ui/EmptyState';
 import { useToast } from '../contexts/ToastContext';
-import { fetchTweets } from '../lib/api';
+import { fetchTweets, fetchHomeFeed } from '../lib/api';
 import { MessageSquare } from 'lucide-react';
 
 const LIMIT = 10;
@@ -19,7 +19,9 @@ const Feed = ({
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [fetchTrigger, setFetchTrigger] = useState(0);
   const [offset, setOffset] = useState(0);
+  const [nextCursor, setNextCursor] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   
   const { addToast } = useToast();
@@ -40,7 +42,7 @@ const Feed = ({
     
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingMoreRef.current) {
-        setOffset(prevOffset => prevOffset + LIMIT);
+        setFetchTrigger(prev => prev + 1);
       }
     }, { threshold: 0.1 });
     
@@ -51,19 +53,27 @@ const Feed = ({
     let isMounted = true;
     const loadTweets = async () => {
       try {
-        if (offset === 0) setLoading(true);
+        if (fetchTrigger === 0) setLoading(true);
         else setIsFetchingMore(true);
 
-        const { res, data } = await fetchTweets(offset, LIMIT);
+        let res, data;
+        if (token) {
+          const currentCursor = fetchTrigger === 0 ? null : nextCursor;
+          ({ res, data } = await fetchHomeFeed(currentCursor, LIMIT));
+        } else {
+          const currentOffset = fetchTrigger === 0 ? 0 : offset + LIMIT;
+          if (isMounted) setOffset(currentOffset);
+          ({ res, data } = await fetchTweets(currentOffset, LIMIT));
+        }
         
-        if (isMounted && res.ok && data.status === 'success' && data.data) {
+        if (!res.ok || data?.status !== 'success') {
+          throw new Error(data?.message || 'Failed to fetch tweets');
+        }
+        
+        if (isMounted && data.data) {
           let fetchedTweets = Array.isArray(data.data) ? data.data : [];
 
-          if (fetchedTweets.length > LIMIT) {
-            fetchedTweets = fetchedTweets.slice(offset, offset + LIMIT);
-          }
-
-          if (offset === 0) {
+          if (fetchTrigger === 0) {
             setTweets(fetchedTweets);
           } else {
             setTweets(prev => {
@@ -73,8 +83,17 @@ const Feed = ({
             });
           }
           
-          if (fetchedTweets.length < LIMIT) {
-            setHasMore(false);
+          if (token) {
+            if (data.nextCursor) {
+              setNextCursor(data.nextCursor);
+              setHasMore(fetchedTweets.length >= LIMIT);
+            } else {
+              setHasMore(false);
+            }
+          } else {
+            if (fetchedTweets.length < LIMIT) {
+              setHasMore(false);
+            }
           }
         }
       } catch {
@@ -84,7 +103,7 @@ const Feed = ({
           setTimeout(() => {
              setLoading(false);
              setIsFetchingMore(false);
-          }, offset === 0 ? 500 : 300);
+          }, fetchTrigger === 0 ? 500 : 300);
         }
       }
     };
@@ -92,7 +111,7 @@ const Feed = ({
     loadTweets();
     
     return () => { isMounted = false; };
-  }, [offset, addToast]);
+  }, [fetchTrigger, token, addToast]);
 
   const handlePostSuccess = (newTweet) => {
     setTweets(prev => [newTweet, ...prev]);

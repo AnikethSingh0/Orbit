@@ -57,8 +57,34 @@ const getAllTweets = async (req, res) => {
     }
 };
 
+const getHomeFeed = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { cursor, limit } = req.query;
+        const tweets = await tweetService.getHomeFeed(userId, cursor, limit);
+        let lastTweet = null;
+        if(tweets.length > 0){
+            lastTweet = tweets[tweets.length - 1].id;
+        }
+        return res.status(200).json({
+            data : tweets,
+            status : 'success',
+            message: 'Home feed fetched successfully',
+            error : {},
+            nextCursor: lastTweet,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: 'Error fetching home feed',
+            
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createTweet,
     getAllTweets,
-    trendingHashtags
+    trendingHashtags,
+    getHomeFeed,
 };

@@ -29,6 +29,6 @@ const tweetSchema = new mongoose.Schema({
         default: 0,
     }
 } , { timestamps: true });
-
+tweetSchema.index({ user: 1, createdAt: -1 });
 const Tweet = mongoose.model('Tweet', tweetSchema);
 module.exports = Tweet;

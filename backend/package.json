@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
     "bullmq": "^5.78.0",

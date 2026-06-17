@@ -11,4 +11,5 @@ router.post('/tweet',passport.authenticate('jwt'
     );
 router.get('/tweets',tweetController.getAllTweets);
 router.get('/trending-hashtags',tweetController.trendingHashtags);
+router.get('/home-feed/:cursor/:limit', passport.authenticate('jwt', { session: false }), tweetController.getHomeFeed);
 module.exports = router;

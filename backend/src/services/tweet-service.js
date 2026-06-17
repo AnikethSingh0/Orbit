@@ -1,9 +1,10 @@
-const {TweetRepository , HashtagRepository} = require('../repository/index');
+const {TweetRepository , HashtagRepository, FollowRepository} = require('../repository/index');
 const redis = require('../config/redis-config');
 class TweetService {
     constructor() {
         this.tweetRepository = new TweetRepository();
         this.hashtagRepository = new HashtagRepository();
+        this.followRepository = new FollowRepository();
     }
     async getTrendingHashtags() {
         try{
@@ -75,6 +76,17 @@ class TweetService {
             throw new Error('Error fetching tweets: ' + error.message);
         }
         
+    }
+    async getHomeFeed(userId,cursor,limit){
+        try{
+            const followingUsers = await this.followRepository.getFollowing(userId);
+            const followingUserIds = followingUsers.map(follow => follow.following._id);
+            followingUserIds.push(userId);
+            const tweets = await this.tweetRepository.getfeed(followingUserIds, cursor, limit);
+            return tweets;
+        }catch(error){
+            throw new Error('Error fetching home feed: ' + error.message);
+        }
     }
 }
 module.exports = TweetService;

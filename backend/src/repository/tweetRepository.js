@@ -109,5 +109,24 @@ class TweetRepository {
             throw new Error('Error fetching tweets by user ID: ' + error.message);
         }
     }
+    async getfeed(userId, cursor , limit) {
+        try {
+            const query = {user: {$in: userId}};
+
+            if(cursor){
+                query._id = { $lt: cursor };
+            }
+
+            const tweets = await Tweet.find(query)
+            .populate('user' , 'name fullName username avatar')
+            .sort({ createdAt: -1 })
+            .limit(limit);
+            
+            return tweets;
+        }
+        catch (error) {
+            throw new Error('Error fetching feed: ' + error.message);
+        }
+    }
 }
 module.exports = TweetRepository;
