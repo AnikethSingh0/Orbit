@@ -6,7 +6,7 @@ const passportGoogleAuth = (passport) => {
     passport.use(new GoogleStrategy({
         clientID: client_id,
         clientSecret: client_secret,
-        callbackURL: "http://localhost:3000/api/v1/auth/google/callback"
+        callbackURL: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/v1/auth/google/callback` : 'http://localhost:3000/api/v1/auth/google/callback',
       },
       async function(accessToken, refreshToken, profile, done) {
         try {

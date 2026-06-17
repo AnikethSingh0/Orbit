@@ -11,7 +11,8 @@ router.get('/google/callback',
     passport.authenticate('google', { session: false }), 
     async (req, res) => {
         const token = await req.user.generateJWT();
-        res.redirect(`http://localhost:5173/?token=${token}`);
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        res.redirect(`${frontendUrl}/?token=${token}`);
         res.status(200).json({
             success: true,
             message: 'Successfully logged in with Google',

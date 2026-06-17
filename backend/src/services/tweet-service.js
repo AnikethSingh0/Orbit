@@ -67,9 +67,9 @@ class TweetService {
 
         return tweet; 
     }
-    async getAll(){
+    async getAll(offset = 0, limit = 10){
         try{
-            const tweets = await this.tweetRepository.getAllTweets(0,10);
+            const tweets = await this.tweetRepository.getAllTweets(offset, limit);
  
             return tweets;
         }catch(error){

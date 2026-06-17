@@ -42,7 +42,8 @@ const createTweet = async (req, res) => {
 };
 const getAllTweets = async (req, res) => {
     try {
-        const tweets = await tweetService.getAll();
+        const { offset = 0, limit = 10 } = req.query;
+        const tweets = await tweetService.getAll(parseInt(offset, 10), parseInt(limit, 10));
         return res.status(200).json({
             data : tweets,
             status : 'success',
@@ -60,8 +61,9 @@ const getAllTweets = async (req, res) => {
 const getHomeFeed = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { cursor, limit } = req.query;
-        const tweets = await tweetService.getHomeFeed(cursor, limit);
+        const { cursor, limit } = req.params;
+        const actualCursor = cursor === 'null' ? null : cursor;
+        const tweets = await tweetService.getHomeFeed(userId, actualCursor, parseInt(limit, 10));
         let lastTweet = null;
         if(tweets.length > 0){
             lastTweet = tweets[tweets.length - 1].id;
