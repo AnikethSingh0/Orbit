@@ -71,7 +71,7 @@ const Messages = ({ userProfile }) => {
   useEffect(() => {
     if (!userProfile?.id) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:3000';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '');
     socketRef.current = io(baseUrl);
 
     socketRef.current.on('connect', () => {

@@ -61,7 +61,7 @@ const getHomeFeed = async (req, res) => {
     try {
         const userId = req.user.id;
         const { cursor, limit } = req.query;
-        const tweets = await tweetService.getHomeFeed(userId, cursor, limit);
+        const tweets = await tweetService.getHomeFeed(cursor, limit);
         let lastTweet = null;
         if(tweets.length > 0){
             lastTweet = tweets[tweets.length - 1].id;

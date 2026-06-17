@@ -79,10 +79,7 @@ class TweetService {
     }
     async getHomeFeed(userId,cursor,limit){
         try{
-            const followingUsers = await this.followRepository.getFollowing(userId);
-            const followingUserIds = followingUsers.map(follow => follow.following._id);
-            followingUserIds.push(userId);
-            const tweets = await this.tweetRepository.getfeed(followingUserIds, cursor, limit);
+            const tweets = await this.tweetRepository.getfeed(cursor, limit);
             return tweets;
         }catch(error){
             throw new Error('Error fetching home feed: ' + error.message);

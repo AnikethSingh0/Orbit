@@ -18,7 +18,7 @@ const getImageUrl = (path) => {
   if (!path) return null;
   if (path.startsWith('http')) return path;
   // Assuming backend runs on 3000 and serves uploads statically, or use VITE_API_BASE_URL
-  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:3000';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '');
   return `${baseUrl}/${path.replace(/\\/g, '/')}`;
 };
 

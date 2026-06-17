@@ -109,14 +109,12 @@ class TweetRepository {
             throw new Error('Error fetching tweets by user ID: ' + error.message);
         }
     }
-    async getfeed(userId, cursor , limit) {
+    async getfeed(cursor , limit) {
         try {
-            const query = {user: {$in: userId}};
-
+            let query = {};
             if(cursor){
                 query._id = { $lt: cursor };
             }
-
             const tweets = await Tweet.find(query)
             .populate('user' , 'name fullName username avatar')
             .sort({ createdAt: -1 })
