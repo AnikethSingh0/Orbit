@@ -278,14 +278,14 @@ const Messages = ({ userProfile }) => {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex h-[100dvh] overflow-hidden">
       {/* Left Sidebar - Contacts List */}
       <div className={`w-full md:w-80 lg:w-96 border-r border-white/10 flex flex-col ${activeChat ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-white/10 sticky top-0 bg-black/80 backdrop-blur-md z-10">
           <h2 className="text-xl font-bold">Messages</h2>
         </div>
         
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-2 pb-24 md:pb-2">
           {loadingContacts ? (
             <div className="flex justify-center p-8 text-gray-500">
               <Loader2 className="animate-spin" />

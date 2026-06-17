@@ -1,4 +1,4 @@
-import { Home, Search, Feather, Bell, User } from 'lucide-react';
+import { Home, Mail, Search, Feather, Bell, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -27,8 +27,11 @@ const MobileNav = ({ onPostClick, userProfile }) => {
         <Link to="/" className={`mobile-nav-item ${location.pathname === '/' ? 'active' : ''}`} aria-label="Home">
           <Home size={24} />
         </Link>
-        <Link to="/explore" className={`mobile-nav-item ${location.pathname === '/explore' ? 'active' : ''}`} aria-label="Search">
+        <Link to="/explore" className={`mobile-nav-item ${location.pathname === '/explore' ? 'active' : ''}`} aria-label="Explore">
           <Search size={24} />
+        </Link>
+        <Link to="/messages" className={`mobile-nav-item ${location.pathname.startsWith('/messages') ? 'active' : ''}`} aria-label="Messages">
+          <Mail size={24} />
         </Link>
         <button 
           onClick={(e) => { e.preventDefault(); toggleDropdown(); }} 

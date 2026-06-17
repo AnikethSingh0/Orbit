@@ -6,6 +6,7 @@ import MobileNav from './MobileNav';
 const Layout = ({ userProfile, onLogout, scrollToComposer }) => {
   const location = useLocation();
   const isMessagesRoute = location.pathname.startsWith('/messages');
+  const isChatRoom = location.pathname.match(/^\/messages\/[^/]+$/);
 
   return (
     <div className={`app-container animate-fade ${isMessagesRoute ? 'app-container-messages' : ''}`}>
@@ -15,7 +16,9 @@ const Layout = ({ userProfile, onLogout, scrollToComposer }) => {
       
       {!isMessagesRoute && <RightSidebar />}
       
-      <MobileNav onPostClick={scrollToComposer} userProfile={userProfile} />
+      <div className={isChatRoom ? 'hidden md:block' : 'block'}>
+        <MobileNav onPostClick={scrollToComposer} userProfile={userProfile} />
+      </div>
     </div>
   );
 };

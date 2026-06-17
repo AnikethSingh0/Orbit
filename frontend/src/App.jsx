@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Setup from './pages/Setup';
 import Messages from './pages/Messages';
 import Notifications from './pages/Notifications';
+import Explore from './pages/Explore';
 
 const AppContent = () => {
   const [token, setTokenState] = useState(getToken());
@@ -81,6 +82,7 @@ const AppContent = () => {
         <Route path="/" element={<Layout userProfile={userProfile} onLogout={handleLogout} scrollToComposer={scrollToComposer} />}>
           <Route index element={<Home token={token} userProfile={userProfile} />} />
           <Route path="setup" element={<Setup userProfile={userProfile} />} />
+          <Route path="explore" element={<Explore />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="profile" element={<Profile userProfile={userProfile} />} />
           <Route path="profile/:userId" element={<Profile userProfile={userProfile} />} />

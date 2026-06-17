@@ -188,13 +188,27 @@ const Profile = ({ userProfile: jwtProfile }) => {
             
             <div className="mt-20">
               {isOwnProfile ? (
-                <Button 
-                  variant="outline" 
-                  className="rounded-full font-bold px-4 py-2"
-                  onClick={() => navigate('/setup')}
-                >
-                  Edit profile
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="rounded-full font-bold px-4 py-2"
+                    onClick={() => navigate('/setup')}
+                  >
+                    Edit profile
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="rounded-full font-bold px-4 py-2 text-red-500 border-red-500/50 hover:bg-red-500/10 md:hidden"
+                    onClick={() => {
+                      import('../lib/api').then(({ removeToken }) => {
+                        removeToken();
+                        window.location.href = '/';
+                      });
+                    }}
+                  >
+                    Log out
+                  </Button>
+                </div>
               ) : (
                 <div className="flex gap-2">
                   <Button 

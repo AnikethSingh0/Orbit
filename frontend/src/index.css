@@ -1244,14 +1244,19 @@ textarea {
 
 .media-item-wrapper {
   position: relative;
-  min-height: 220px;
+  width: 100%;
   aspect-ratio: 16 / 10;
+  overflow: hidden;
 }
 
 .media-grid.single .media-item-wrapper {
-  min-height: 280px;
-  max-height: 520px;
-  aspect-ratio: 16 / 11;
+  min-height: auto;
+  max-height: 60vh;
+  aspect-ratio: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: black;
 }
 
 .media-item {
@@ -1260,6 +1265,13 @@ textarea {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.media-grid.single .media-item {
+  position: relative;
+  max-height: 60vh;
+  height: auto;
+  object-fit: contain;
 }
 
 img.media-item {
@@ -2208,7 +2220,10 @@ input[type="range"] {
   }
 
   .media-grid.single .media-item-wrapper {
-    min-height: 220px;
+    max-height: 50vh;
+  }
+  .media-grid.single .media-item {
+    max-height: 50vh;
   }
 
   .reply-composer-area {
