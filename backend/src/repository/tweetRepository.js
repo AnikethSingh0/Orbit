@@ -126,5 +126,15 @@ class TweetRepository {
             throw new Error('Error fetching feed: ' + error.message);
         }
     }
+    async getTweetsByIds(tweetIds) {
+        try {
+            if(!tweetIds || tweetIds.length === 0) return [];
+            const tweets = await Tweet.find({_id: {$in: tweetIds}}).populate('user','avatar username fullName');
+            const tweetsMap = new Map(tweets.map(t => [t._id.toString(), t]));
+            return tweetIds.map(id => tweetsMap.get(id.toString())).filter(Boolean);
+        } catch (error) {
+            throw new Error('Error fetching tweets by ids: ' + error.message);
+        }
+    }
 }
 module.exports = TweetRepository;

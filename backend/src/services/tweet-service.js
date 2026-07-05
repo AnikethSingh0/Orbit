@@ -1,4 +1,5 @@
 const {TweetRepository , HashtagRepository, FollowRepository} = require('../repository/index');
+const FeedQueue = require('../queue/feed-queue');
 const redis = require('../config/redis-config');
 class TweetService {
     constructor() {
@@ -36,12 +37,18 @@ class TweetService {
     }
     async create(data){
         const tweet = await this.tweetRepository.createTweet(data);
+
+        //put tweet id and user id in the queue
+        await FeedQueue.add('fanout-tweet', {
+            tweetId: tweet._id,
+            userId: tweet.userId
+        });
+
         /*
              - first we will validate the data
              - then we will extract the hashtags from the content and save them in the database
              - using regex to validate the hashtags
         */
-
         const content = data.content || "";
         let tags = content.match(/#\w+/g) || [];
 
@@ -79,8 +86,26 @@ class TweetService {
     }
     async getHomeFeed(userId,cursor,limit){
         try{
-            const tweets = await this.tweetRepository.getfeed(cursor, limit);
-            return tweets;
+            const feedKey = `feed:${userId}`;
+            const zsetsize = await redis.zcard(feedKey);
+
+            if(zsetsize > 0){
+                //we have tweets in the feed, we will fetch them from the zset
+                let start = 0;
+                if(cursor){
+                    //if cursor is present, we will fetch the tweets from the zset using the cursor
+                    const rank = await redis.zrevrank(feedKey, cursor);
+                    if(rank !== null){
+                        start = rank + 1;
+                    }
+                }
+                const tweetIds = await redis.zrevrange(feedKey, start, start + limit - 1);
+                return await this.tweetRepository.getTweetsByIds(tweetIds);
+            }else{
+                const tweets = await this.tweetRepository.getfeed(cursor, limit);
+                return tweets;
+            }
+            
         }catch(error){
             throw new Error('Error fetching home feed: ' + error.message);
         }

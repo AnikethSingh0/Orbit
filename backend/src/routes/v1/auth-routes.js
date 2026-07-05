@@ -13,11 +13,6 @@ router.get('/google/callback',
         const token = await req.user.generateJWT();
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         res.redirect(`${frontendUrl}/?token=${token}`);
-        res.status(200).json({
-            success: true,
-            message: 'Successfully logged in with Google',
-            data: token
-        });
     }
 );
 

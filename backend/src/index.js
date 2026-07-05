@@ -7,6 +7,8 @@ const passportGoogleAuth = require('./middleware/google-middleware');
 const { configureSockets } = require('./config/socket-config');
 require('./workers/notification-workers');
 require('./queue/notification-queue');
+require('./workers/feed-worker');
+require('./queue/feed-queue');
 const redis = require('./config/redis-config.js');
 const cors = require('cors');
 const http = require('http');

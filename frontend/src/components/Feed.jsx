@@ -71,7 +71,15 @@ const Feed = ({
         }
         
         if (isMounted && data.data) {
-          let fetchedTweets = Array.isArray(data.data) ? data.data : [];
+          let fetchedTweets = [];
+          let currentNextCursor = data.nextCursor;
+
+          if (Array.isArray(data.data)) {
+            fetchedTweets = data.data;
+          } else if (data.data.tweets && Array.isArray(data.data.tweets)) {
+            fetchedTweets = data.data.tweets;
+            currentNextCursor = data.data.nextCursor || data.nextCursor;
+          }
 
           if (fetchTrigger === 0) {
             setTweets(fetchedTweets);
@@ -84,8 +92,8 @@ const Feed = ({
           }
           
           if (token) {
-            if (data.nextCursor) {
-              setNextCursor(data.nextCursor);
+            if (currentNextCursor) {
+              setNextCursor(currentNextCursor);
               setHasMore(fetchedTweets.length >= LIMIT);
             } else {
               setHasMore(false);
